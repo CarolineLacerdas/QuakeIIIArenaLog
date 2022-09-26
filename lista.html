@@ -37,23 +37,23 @@
                     var pontuacao = new Map(); //mapa guarda dois valores chave e valor
                     var jogadores = new Set(); //set não deixa repetir cria lista para preencher jogadores unicos
 
-                    for(var line = 0; line < lines.length; line++){
+                    for(var line = 0; line < lines.length; line++){ //for passando linha a linha
                                         
-                        var string = lines[line];
-                        var substring = "killed";
+                        var string = lines[line]; // recebe todo o conteúdo da linha
+                        var substring = "killed"; 
                         var novojogo = "InitGame";
 
                         //acha a linha de quando houve mudança no score
                         var killed = string.indexOf(substring);
 
-                        if (killed != -1) {
+                        if (killed != -1) { // se encontrar "killed" na linha
 
-                            var matou = string.substring(string.lastIndexOf(":") + 1,killed).trim();
-                            var morreu = string.substring(killed + 6, string.indexOf("by")).trim();
+                            var matou = string.substring(string.lastIndexOf(":") + 1,killed).trim(); // variável matou recebe o valor contido entre o último ':' e 'killed'
+                            var morreu = string.substring(killed + 6, string.indexOf("by")).trim(); // variável recebe o valor após 'killed' e antes de 'by'
 
                             //Insere quem matou e quem morreu na lista de forma unica
                          
-                         if(matou != "<world>"){
+                         if(matou != "<world>"){ // verifica se quem matou é diferente de '<world>', pois só contaremos os jogadores
                          
                             jogadores.add(matou);
 
@@ -70,7 +70,7 @@
 
                         }
 
-                        else if (string.indexOf(novojogo) != -1) {
+                        else if (string.indexOf(novojogo) != -1) { // verifica se é uma nova partida
                             
                             jogadores.forEach(function contarPontos(jogador) {
                             
@@ -103,7 +103,7 @@
                             )
                             
                             if(partida > 0){
-
+                                // montagem do json
                                 var json = "\"game_" + partida + "\": {";
                                 json += "\n \"total_kills\": " + listamorreu.length;
                                 json += "\n \"players\": " + JSON.stringify(Array.from(jogadores.values()));
