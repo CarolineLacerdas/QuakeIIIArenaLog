@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width" />
+
+        <title>lista</title>
+        
+    </head>
+
+    <body>
+        
+        Por favor selecione o arquivo de log:
+        
+        <input type="file" id="idfile" /><br />
+
+        <script>
+
+            document.getElementById('idfile').onchange = function(){
+
+                var file = this.files[0];
+
+                var reader = new FileReader();
+                reader.onload = function(progressEvent){
+                    // Entire file
+                    
+                    /////console.log(this.result);
+
+                    // By lines
+                    var lines = this.result.split("\n");
+
+                    var partida = 0;
+                    //cria array para calcular pontos
+                    var listamatou = []; //lista deixa repetir
+                    var listamorreu = []; //lista
+                    var pontuacao = new Map(); //mapa guarda dois valores chave e valor
+                    var jogadores = new Set(); //set não deixa repetir cria lista para preencher jogadores unicos
+
+                    for(var line = 0; line < lines.length; line++){
+                                        
+                        var string = lines[line];
+                        var substring = "killed";
+                        var novojogo = "InitGame";
+
+                        //acha a linha de quando houve mudança no score
+                        var killed = string.indexOf(substring);
+
+                        if (killed != -1) {
+
+                            var matou = string.substring(string.lastIndexOf(":") + 1,killed).trim();
+                            var morreu = string.substring(killed + 6, string.indexOf("by")).trim();
+
+                            //Insere quem matou e quem morreu na lista de forma unica
+                         
+                         if(matou != "<world>"){
+                         
+                            jogadores.add(matou);
+
+                        }
+                            jogadores.add(morreu);
+
+                            //insere no array a pontuação da linha que houve mudança no score
+                            if (matou != morreu){
+
+                                listamatou.push(matou);
+                                listamorreu.push(morreu);
+                            
+                            }
+
+                        }
+
+                        else if (string.indexOf(novojogo) != -1) {
+                            
+                            jogadores.forEach(function contarPontos(jogador) {
+                            
+                                var qtdematou = 0;
+                                var qtdemorreu = 0;
+                                for(var i = 0; i < listamatou.length; i++){
+        
+                                    if (listamatou[i] == jogador) {
+                            
+                                        qtdematou++;
+                            
+                                    }
+                            
+                                }
+                            
+                                for(var i = 0; i < listamorreu.length; i++){
+                            
+                                    if (listamorreu[i] == jogador) {
+                            
+                                        qtdemorreu++;
+                            
+                                    }
+                            
+                                }
+                            
+                                pontuacao.set(jogador, qtdematou);
+
+                            }
+
+                            )
+                            
+                            if(partida > 0){
+
+                                var json = "\"game_" + partida + "\": {";
+                                json += "\n \"total_kills\": " + listamorreu.length;
+                                json += "\n \"players\": " + JSON.stringify(Array.from(jogadores.values()));
+                                json += "\n \"kills\": " + JSON.stringify(Array.from(pontuacao));
+                                json += "}";
+                                console.log(json);
+                            }
+
+                            partida++; //fecha partida
+                           
+                            listamatou = [];
+                            listamorreu = [];
+                            jogadores.clear();
+                            pontuacao.clear();
+
+                        }
+                    
+                    }
+
+                    jogadores.forEach(function contarPontos(jogador) {
+                            
+                            var qtdematou = 0;
+                            var qtdemorreu = 0;
+                            for(var i = 0; i < listamatou.length; i++){
+    
+                                if (listamatou[i] == jogador) {
+                        
+                                    qtdematou++;
+                        
+                                }
+                        
+                            }
+                        
+                            for(var i = 0; i < listamorreu.length; i++){
+                        
+                                if (listamorreu[i] == jogador) {
+                        
+                                    qtdemorreu++;
+                        
+                                }
+                        
+                            }
+                        
+                            pontuacao.set(jogador, qtdematou);
+
+                        }
+
+                        )
+                    
+                    var json = "\"game_" + partida + "\": {";
+                                json += "\n \"total_kills\": " + listamorreu.length;
+                                json += "\n \"players\": " + JSON.stringify(Array.from(jogadores.values()));
+                                json += "\n \"kills\": " + JSON.stringify(Array.from(pontuacao));
+                                json += "}";
+                                console.log(json);
+
+
+
+
+
+
+                
+                }
+                    
+                reader.readAsText(file);
+            
+            }
+        
+        </script>
+    </body>
+</html>
